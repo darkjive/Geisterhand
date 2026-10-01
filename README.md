@@ -7,11 +7,18 @@ Steuert deinen Browser automatisch per KI-Agent mit [browser-use](https://github
 ```bash
 git clone <dieses-repo> && cd Geisterhand
 uv sync
-cp .env.example .env      # API-Key eintragen
+cp .env.example .env      # OpenRouter-Key oder Ollama-Modell eintragen
 ```
 
 > Wichtig: Der Agent muss auf dem Rechner laufen, auf dem dein Browser läuft.
 > Eine Cloud-Session kann deinen lokalen Browser nicht steuern.
+
+## LLM-Anbieter
+
+In `.env` einstellen: `OPENROUTER_API_KEY` (Modell per `GEISTERHAND_MODEL`, Standard `anthropic/claude-sonnet-4.5`)
+oder lokal mit Ollama: `GEISTERHAND_PROVIDER=ollama`, `GEISTERHAND_MODEL=<modell>`. Auch Anthropic, OpenAI
+und browser-use Cloud gehen. Mit Ollama bleiben Seiteninhalte (z.B. Mails) auf deinem Rechner, kleine Modelle
+steuern Browser aber deutlich schlechter.
 
 ## Schnellstart mit deinem Chrome und Logins
 

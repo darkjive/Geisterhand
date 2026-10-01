@@ -70,15 +70,32 @@ def ensure_chrome(chrome_path: str | None = None) -> str:
 
 
 def make_llm():
-    from browser_use import ChatAnthropic, ChatBrowserUse, ChatOpenAI
+    """Provider per GEISTERHAND_PROVIDER (openrouter|ollama|anthropic|openai|browser-use) oder automatisch nach vorhandenem Key."""
+    from browser_use import ChatAnthropic, ChatBrowserUse, ChatOllama, ChatOpenAI, ChatOpenRouter
 
-    if os.getenv("ANTHROPIC_API_KEY"):
-        return ChatAnthropic(model=os.getenv("GEISTERHAND_MODEL", "claude-sonnet-4-5"))
-    if os.getenv("OPENAI_API_KEY"):
-        return ChatOpenAI(model=os.getenv("GEISTERHAND_MODEL", "gpt-4.1"))
-    if os.getenv("BROWSER_USE_API_KEY"):
+    provider = os.getenv("GEISTERHAND_PROVIDER", "").lower()
+    model = os.getenv("GEISTERHAND_MODEL")
+    if not provider:
+        for env, name in [("OPENROUTER_API_KEY", "openrouter"), ("ANTHROPIC_API_KEY", "anthropic"),
+                          ("OPENAI_API_KEY", "openai"), ("BROWSER_USE_API_KEY", "browser-use")]:
+            if os.getenv(env):
+                provider = name
+                break
+        else:
+            provider = "ollama" if os.getenv("OLLAMA_HOST") or os.getenv("GEISTERHAND_MODEL") else ""
+    if provider == "openrouter":
+        return ChatOpenRouter(model=model or "anthropic/claude-sonnet-4.5")
+    if provider == "ollama":
+        if not model:
+            sys.exit("Für Ollama GEISTERHAND_MODEL setzen, z.B. qwen2.5:32b (siehe .env.example).")
+        return ChatOllama(model=model, host=os.getenv("OLLAMA_HOST"))
+    if provider == "anthropic":
+        return ChatAnthropic(model=model or "claude-sonnet-4-5")
+    if provider == "openai":
+        return ChatOpenAI(model=model or "gpt-4.1")
+    if provider == "browser-use":
         return ChatBrowserUse()
-    sys.exit("Kein API-Key gefunden. Setze ANTHROPIC_API_KEY, OPENAI_API_KEY oder BROWSER_USE_API_KEY (siehe .env.example).")
+    sys.exit("Kein LLM konfiguriert. Setze OPENROUTER_API_KEY oder GEISTERHAND_PROVIDER=ollama (siehe .env.example).")
 
 
 def make_browser(args):
