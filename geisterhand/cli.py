@@ -120,7 +120,11 @@ def make_browser(args):
 async def run(args):
     from browser_use import Agent
 
-    agent = Agent(task=args.task, llm=make_llm(), browser=make_browser(args))
+    # Lokale Modelle brauchen länger als das browser-use-Standardlimit (75s)
+    timeout = int(os.getenv("GEISTERHAND_LLM_TIMEOUT", "300"))
+    vision = os.getenv("GEISTERHAND_VISION", "auto").lower()  # auto|true|false
+    agent = Agent(task=args.task, llm=make_llm(), browser=make_browser(args), llm_timeout=timeout,
+                  use_vision=vision if vision == "auto" else vision == "true")
     history = await agent.run(max_steps=args.max_steps)
     print("\n=== Ergebnis ===\n" + (history.final_result() or "(kein Ergebnis)"))
 
