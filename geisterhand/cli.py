@@ -84,18 +84,20 @@ def make_llm():
 def make_browser(args):
     from browser_use import Browser
 
+    extra = {"allowed_domains": args.allow_domain} if args.allow_domain else {}
     if args.cdp_url:  # laufenden Chrome übernehmen
-        return Browser(cdp_url=args.cdp_url, keep_alive=True)
+        return Browser(cdp_url=args.cdp_url, keep_alive=True, **extra)
     if args.chrome:  # eigenes Geisterhand-Chrome (mit gespeicherten Logins) starten/übernehmen
-        return Browser(cdp_url=ensure_chrome(args.chrome_path), keep_alive=True)
+        return Browser(cdp_url=ensure_chrome(args.chrome_path), keep_alive=True, **extra)
     if args.profile:  # eigenes Chrome-Profil (Logins, Cookies) -> Chrome vorher schließen!
         return Browser(
             executable_path=args.chrome_path or None,
             user_data_dir=chrome_user_data_dir(),
             profile_directory=args.profile,
             headless=False,
+            **extra,
         )
-    return Browser(headless=args.headless)  # frische, isolierte Instanz
+    return Browser(headless=args.headless, **extra)  # frische, isolierte Instanz
 
 
 async def run(args):
@@ -117,6 +119,8 @@ def main():
                    help="Chrome mit dauerhaftem Geisterhand-Profil nutzen (empfohlen, Logins bleiben erhalten)")
     g.add_argument("--profile", help='Chrome-Profil nutzen, z.B. "Default" (Chrome vorher schließen)')
     p.add_argument("--chrome-path", help="Pfad zur Chrome-Binary (optional)")
+    p.add_argument("--allow-domain", action="append", metavar="DOMAIN",
+                   help='Agent darf nur diese Domains öffnen, mehrfach nutzbar, z.B. --allow-domain "*.github.com"')
     p.add_argument("--headless", action="store_true", help="Ohne sichtbares Fenster (nur frische Instanz)")
     p.add_argument("--max-steps", type=int, default=50)
     p.add_argument("--login", action="store_true",
