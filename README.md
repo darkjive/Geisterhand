@@ -25,6 +25,16 @@ uv run geisterhand --chrome "Aufgabe"      # ab dann: nutzt dieses Chrome inkl. 
 Dein normales Chrome-Standardprofil lässt sich nicht freigeben, weil Chrome 136+ den Debug-Port
 dafür sperrt.
 
+## Domains einschränken
+
+Mit deinen Logins kann der Agent auf deinen Namen handeln. Beschränke ihn auf vertrauenswürdige Seiten:
+
+```bash
+uv run geisterhand --chrome --allow-domain github.com --allow-domain "*.github.com" "Zeige meine offenen PRs"
+```
+
+Ohne `--allow-domain` ist keine Einschränkung aktiv.
+
 ## Weitere Optionen
 
 ```bash
