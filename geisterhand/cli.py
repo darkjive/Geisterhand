@@ -88,7 +88,9 @@ def make_llm():
     if provider == "ollama":
         if not model:
             sys.exit("Für Ollama GEISTERHAND_MODEL setzen, z.B. qwen2.5:32b (siehe .env.example).")
-        return ChatOllama(model=model, host=os.getenv("OLLAMA_HOST"))
+        # Ollama-Standardkontext (16k) ist für browser-use zu klein
+        num_ctx = int(os.getenv("GEISTERHAND_NUM_CTX", "32768"))
+        return ChatOllama(model=model, host=os.getenv("OLLAMA_HOST"), ollama_options={"num_ctx": num_ctx})
     if provider == "anthropic":
         return ChatAnthropic(model=model or "claude-sonnet-4-5")
     if provider == "openai":
