@@ -13,7 +13,19 @@ cp .env.example .env      # API-Key eintragen
 > Wichtig: Der Agent muss auf dem Rechner laufen, auf dem dein Browser läuft.
 > Eine Cloud-Session kann deinen lokalen Browser nicht steuern.
 
-## Nutzung
+## Schnellstart mit deinem Chrome und Logins
+
+```bash
+uv run geisterhand --login                 # einmalig: Chrome öffnet sich, bei deinen Seiten einloggen
+uv run geisterhand --chrome "Aufgabe"      # ab dann: nutzt dieses Chrome inkl. gespeicherter Logins
+```
+
+`--chrome` startet Chrome mit Debug-Port und dem Profil `~/.geisterhand/chrome-profile`
+(bzw. übernimmt es, falls es schon läuft). Die Logins bleiben dort dauerhaft gespeichert.
+Dein normales Chrome-Standardprofil lässt sich nicht freigeben, weil Chrome 136+ den Debug-Port
+dafür sperrt.
+
+## Weitere Optionen
 
 ```bash
 # 1) Frische, isolierte Browser-Instanz
